@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Latihan Soal Statistika</title>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f3f4f6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        max-width: 800px;
+        width: 90%;
+        margin: 20px auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: #4f46e5;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px;
+      }
+      .question-container {
+        display: none;
+      }
+      .question-container.active {
+        display: block;
+      }
+      .question-text {
+        font-size: 18px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+      .options-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .option-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .option-btn:hover {
+        background: #e0e7ff;
+        border-color: #c7d2fe;
+      }
+      .option-btn.selected {
+        background: #4f46e5;
+        color: white;
+        border-color: #4f46e5;
+      }
+      .option-btn.correct {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+      }
+      .option-btn.wrong {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+      }
+      .btn {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        float: right;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #4338ca;
+      }
+      .btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+      .clearfix::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      .score-container {
+        text-align: center;
+        display: none;
+      }
+      .score-container h2 {
+        font-size: 32px;
+        color: #4f46e5;
+      }
+      table {
+        border-collapse: collapse;
+        margin: 15px 0;
+        width: 100%;
+        text-align: center;
+      }
+      th,
+      td {
+        border: 1px solid #d1d5db;
+        padding: 8px;
+      }
+      th {
+        background: #f3f4f6;
+      }
+      .data-box {
+        font-family: monospace;
+        background: #f9fafb;
+        padding: 15px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin: 15px 0;
+        line-height: 1.8;
+        letter-spacing: 1px;
+      }
+      .feedback {
+        margin-top: 15px;
+        font-weight: bold;
+        font-size: 16px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Latihan Soal Statistika</h1>
+        <p id="progress-text">Memuat pertanyaan...</p>
+      </div>
+
+      <div class="content">
+        <div id="quiz-body"></div>
+
+        <div class="score-container" id="score-container">
+          <h2>Kuis Selesai!</h2>
+          <p style="font-size: 20px">
+            Skor Kamu: <strong id="final-score">0</strong> /
+            <span id="total-questions"></span>
+          </p>
+          <button
+            class="btn"
+            onclick="location.reload()"
+            style="float: none; margin-top: 30px"
+          >
+            Ulangi Kuis (Soal Diacak Lagi)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        {
+          text: "Agar observasi yang diperoleh dapat dijadikan landasan yang benar, maka diperlukan rancangan ....",
+          options: [
+            "biaya yang besar untuk pengumpulan data",
+            "pengolahan data yang akan diperoleh",
+            "proses pengambilan dan penentuan ukuran sampel",
+            "populasi yang akan diambil",
+          ],
+          correct: 2,
+        },
+        {
+          text: "Statistika inferensial adalah statistika yang mempelajari tentang cara ....",
+          options: [
+            "meringkas data",
+            "menggambarkan segi-segi yang penting dari data",
+            "menghitung ukuran-ukuran penting data",
+            "mengevaluasi data dan penafsiran tentang pengetahuan baru berdasarkan data",
+          ],
+          correct: 3,
+        },
+        {
+          text: "Statistika dapat dipandang sebagai seni dan ilmu yang mempelajari tentang ....",
+          options: [
+            "pembeberan data",
+            "penyajian dan penginterpretasian data",
+            "penyimpanan data",
+            "pengolahan dan penimbunan data",
+          ],
+          correct: 1,
+        },
+        {
+          text: `Dipunyai data \\(X_{ij}\\) sebagai berikut:
+                   <table>
+                     <tr><th>i \\ j</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+                     <tr><td><b>1</b></td><td>12</td><td>26</td><td>24</td><td>23</td></tr>
+                     <tr><td><b>2</b></td><td>15</td><td>29</td><td>25</td><td>27</td></tr>
+                     <tr><td><b>3</b></td><td>13</td><td>21</td><td>22</td><td>30</td></tr>
+                   </table>
+                   maka \\( ( X_{23} + X_{34} + X_{12} + X_{31} ) \\) sama dengan ....`,
+          options: ["93", "83", "72", "61"],
+          correct: 0,
+        },
+        {
+          text: `Dipunyai data tinggi (X) dan berat (Y) badan enam orang sebagai berikut.
+                   <table>
+                     <tr><th>i</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+                     <tr><td><b>X_i</b></td><td>150</td><td>160</td><td>170</td><td>145</td><td>155</td><td>165</td></tr>
+                     <tr><td><b>Y_i</b></td><td>45</td><td>65</td><td>70</td><td>50</td><td>40</td><td>60</td></tr>
+                   </table>
+                   Jika \\( \\bar{X} = \\frac{1}{6}\\sum_{i=1}^{6} X_i \\) dan \\( \\bar{Y} = \\frac{1}{6}\\sum_{i=1}^{6} Y_i \\), maka \\( \\sum_{i=1}^{6} (X_i - \\bar{X})(Y_i - \\bar{Y}) \\) sama dengan ....`,
+          options: ["0", "2700", "345", "425"],
+          correct: 3,
+        },
+        {
+          text: `Dipunyai bilangan-bilangan \\( x_1=5, x_2=8, x_3=3, x_4=9, x_5=6 \\), maka \\( \\frac{1}{5}\\sum_{i=1}^{5} (X_i - \\bar{X})^2 \\), dimana \\( \\bar{X} = \\frac{1}{5}\\sum_{i=1}^{5} x_i \\), adalah ....`,
+          options: ["52,51", "38,62", "26,71", "4,84"],
+          correct: 3,
+        },
+        {
+          text: "Skala pengukuran yang mempunyai jarak disebut sebagai skala ....",
+          options: ["interval", "ordinal", "nominal", "kategori"],
+          correct: 0,
+        },
+        {
+          text: "Dari sekelompok produk dicatat produk yang cacat. Data yang diperoleh merupakan data ....",
+          options: ["kontinu", "nominal", "kategorik", "diskrit"],
+          correct: 3,
+        },
+        {
+          text: "Misalkan data gaji (dalam rupiah) pegawai negeri sipil diklasifikasi menjadi rendah, menengah, dan tinggi. Berarti data diubah dari data ....",
+          options: [
+            "kategorik menjadi kontinu",
+            "kontinu menjadi kategorik",
+            "kualitatif menjadi kuantitatif",
+            "kuantitatif menjadi kontinu",
+          ],
+          correct: 1,
+        },
+        {
+          text: `Sebanyak 31 siswa mencoba menebak panjang tali. Panjang tali yang sebenarnya adalah 60 cm. Hasil tebakan siswa tersebut adalah sebagai berikut.
+                   <div class="data-box">
+                   61 70 46 44 26 23 30 83 52 44 38 37<br>
+                   49 59 58 63 31 29 37 48 76 61 46 31<br>
+                   38 41 49 52 56 75 61
+                   </div>
+                   Jika data disusun dalam tabel frekuensi dengan kelas-kelas interval:<br>
+                   19,5 - 29,5<br>
+                   29,5 - 39,5<br>
+                   39,5 - 49,5<br>
+                   49,5 - 59,5<br>
+                   59,5 - 69,5<br>
+                   69,5 - 79,5<br>
+                   79,5 - 89,5<br><br>
+                   Frekuensi kelas interval 29,5 - 39,5 adalah ....`,
+          options: ["3", "4", "6", "7"],
+          correct: 3,
+        },
+        {
+          text: `Dipunyai data nilai ujian statistika dari 10 orang mahasiswa sebagai berikut:<div class="data-box">93 56 48 84 72 68 51 43 96 84</div>Median nilai ujian statistika tersebut adalah ....`,
+          options: ["68", "70", "84", "96"],
+          correct: 1,
+        },
+        {
+          text: `Berat badan 25 mahasiswa yang dipilih secara random dari berat badan semua mahasiswa UT adalah:<div class="data-box">25 50 52 43 53<br>57 45 50 55 46<br>50 48 50 48 55<br>60 63 55 67 65<br>64 58 63 57 60</div>Mean berat badan 25 mahasiswa tersebut sama dengan ....`,
+          options: ["53,46", "56,34", "54,63", "54,36"],
+          correct: 3,
+        },
+        {
+          text: `Data kehadiran pertemuan suatu klub untuk 20 kali pertemuan adalah<div class="data-box">26 25 28 23 25 24 24 21 23 26 28 26 24 32 25 27 24 23 24 22</div>Modus data tersebut adalah ....`,
+          options: ["23", "24", "25", "26"],
+          correct: 1,
+        },
+        {
+          text: `Telah dihitung berat badan 25 mahasiswa UT dan diperoleh deviasi standar = 6,91 dan jumlah berat badan = 1359, maka jumlah kuadrat berat badan ke 25 mahasiswa tersebut sama dengan ....`,
+          options: ["75021,19", "73922,99", "73875,24", "72729,29"],
+          correct: 0,
+        },
+        {
+          text: `Dari himpunan data \\(X_1, X_2, ..., X_n\\) diketahui \\(\\sum X = 25\\); \\(\\sum X^2 = 37\\) dan variansinya = 2. Maka \\(n\\) sama dengan ....`,
+          options: ["15", "20", "25", "30"],
+          correct: 2,
+        },
+        {
+          text: `Dipunyai data dalam distribusi frekuensi sebagai berikut :<br>
+                   <table>
+                     <tr><th>Interval</th><th>Frekuensi</th></tr>
+                     <tr><td>0 - 25</td><td>5</td></tr>
+                     <tr><td>25 - 50</td><td>8</td></tr>
+                     <tr><td>50 - 75</td><td>13</td></tr>
+                     <tr><td>75 - 100</td><td>11</td></tr>
+                     <tr><td>100 - 125</td><td>3</td></tr>
+                   </table>
+                   dengan \\(\\bar{X} = 61,875\\), maka variansi data sama dengan ....`,
+          options: ["222,3", "421,5", "623,7", "796,5"],
+          correct: 3,
+        },
+        {
+          text: `Dari sekelompok orang yang terdiri dari 2 wanita (W) dan 3 laki-laki (L) dipilih tiga orang untuk menjadi delegasi suatu kongres. Jika Q adalah kejadian paling banyak 2 orang laki-laki, maka bilangan Q adalah ....`,
+          options: [
+            "{ WWW, WWL, WLW, LWW, WLL, LWL, LLW }",
+            "{ WWL, WLW, LWW, WLL, LWL, LLW }",
+            "{ WLL, LWL, LLW }",
+            "{ LLL }",
+          ],
+          correct: 1,
+        },
+        {
+          text: `Pengertian tentang eksperimen statistik berikut ini yang benar adalah ....`,
+          options: [
+            "eksperimen menghasilkan 'hasil' yang tidak pasti",
+            "eksperimen adalah proses pengolahan data",
+            "eksperimen menghasilkan 'hasil' yang pasti",
+            "eksperimen adalah proses penyajian data",
+          ],
+          correct: 0,
+        },
+        {
+          text: `Diberikan data nilai untuk 15 mahasiswa yang disajikan dalam tabel distribusi frekuensi sbb.<br>
+                   <table>
+                     <tr><th>Nilai</th><th>Frekuensi</th></tr>
+                     <tr><td>A</td><td>1</td></tr>
+                     <tr><td>B</td><td>4</td></tr>
+                     <tr><td>C</td><td>6</td></tr>
+                     <tr><td>D</td><td>2</td></tr>
+                     <tr><td>E</td><td>2</td></tr>
+                   </table>
+                   Histogram untuk nilai A, B, C adalah histogram dengan ....`,
+          options: [
+            "Batang A setinggi 1, B setinggi 4, C setinggi 5",
+            "Batang A setinggi 4, B setinggi 3, C setinggi 2",
+            "Batang A setinggi 5, B setinggi 3, C setinggi 1",
+            "Batang A setinggi 1, B setinggi 4, C setinggi 6",
+          ],
+          correct: 3,
+        },
+        {
+          text: `Data nilai grade untuk 15 mahasiswa disajikan dalam tabel distribusi frekuensi berikut.<br>
+                   <table>
+                     <tr><th>Nilai</th><th>Frekuensi</th></tr>
+                     <tr><td>A</td><td>1</td></tr>
+                     <tr><td>B</td><td>4</td></tr>
+                     <tr><td>C</td><td>6</td></tr>
+                     <tr><td>D</td><td>2</td></tr>
+                     <tr><td>E</td><td>2</td></tr>
+                   </table>
+                   Histogram untuk kelas nilai C, D dan E adalah histogram dengan ....`,
+          options: [
+            "Batang berlabel A setinggi 6, B setinggi 2, C setinggi 2",
+            "Batang berlabel A setinggi 6, B setinggi 3, C setinggi 2",
+            "Batang berlabel C setinggi 6, D setinggi 2, E setinggi 2",
+            "Batang berlabel C setinggi 6, D setinggi 4, E setinggi 1",
+          ],
+          correct: 2,
+        },
+        {
+          text: "Ruang sampel dari pelemparan sebuah dadu sebanyak 1 kali adalah ....",
+          options: ["{1,2,3,4,5,6}", "{2,4,6}", "{1,3,5}", "{}"],
+          correct: 0,
+        },
+        {
+          text: "Untuk seorang siswa yang dipilih secara random, pandang peristiwa A=takut dan B = siswa Sekolah Menengah Pertama. Maka P(A \\cup B) sama dengan .... (Berdasarkan data tabel)",
+          options: ["0,20", "0,30", "0,40", "0,50"],
+          correct: 3,
+        },
+        {
+          text: "Dipunyai diagram venn dengan angka-angka probabilitas di dalamnya. Maka P[(A \\cap B) \\cup (B \\cap C)] sama dengan ....",
+          options: ["0,15", "0,2", "0,25", "0,3"],
+          correct: 0,
+        },
+        {
+          text: "Himpunan 550 orang diklasifikasikan menurut jenis kelamin dan golongan darah mereka. Seorang dipilih secara random, maka P(O) sama dengan ....",
+          options: ["0,329", "0,429", "0,529", "0,629"],
+          correct: 1,
+        },
+        {
+          text: "Diketahui probabilitas tiga peristiwa A, B, C masing-masing P(A)=0,5, P(B)=0,3 dan P(C)=0,2. Jika untuk suatu peristiwa lain X, diketahui P(X|A)=0,6, P(X|B)=0,8 dan P(X|C)=0,4. Maka P(A|X) sama dengan ....",
+          options: ["0,67", "0,51", "0,48", "0,32"],
+          correct: 0,
+        },
+        {
+          text: "Himpunan 550 orang diklasifikasikan menurut jenis kelamin dan golongan darah mereka. Maka P(B|L) sama dengan ....",
+          options: ["0,064", "0,140", "0,127", "0,455"],
+          correct: 0,
+        },
+        {
+          text: "Dua unit mesin menghasilkan jenis barang sama dengan data kerusakan. Misalkan sebuah barang dipilih dan ternyata rusak, peluang bahwa barang tersebut berasal dari mesin 1(M1) adalah ....",
+          options: ["1/9", "2/5", "1/12", "1/30"],
+          correct: 0,
+        },
+        {
+          text: "Dari 3 pria dan 2 wanita akan dipilih untuk menjadi satu ketua dan satu wakil ketua. Banyak kemungkinan formasi adalah ....",
+          options: ["3", "5", "6", "10"],
+          correct: 1,
+        },
+        {
+          text: "Andaikan empat kartu diambil dari satu set kartu bridge tanpa pengembalian. Peluang akan mendapatkan 4 kartu warna hitam adalah ....",
+          options: ["66/2499", "69/2499", "132/2499", "138/2499"],
+          correct: 0,
+        },
+        {
+          text: "Sebuah kotak berisi 12 bola, 8 bola berwarna merah, dan 4 bola berwarna putih. Kita ambil sekaligus dua bola secara random dari kotak tersebut, probabilitas kedua bola berwarna sama ialah ....",
+          options: ["1/11", "2/11", "16/33", "17/33"],
+          correct: 1,
+        },
+        {
+          text: "Misalkan fungsi probabilitas \\( f(x) = \\frac{27}{65}(\\frac{2}{3})^{x-1} \\), \\( x = 1, 2, 3, 4 \\), maka \\( P(X = 4) = \\dots \\)",
+          options: ["27/65", "18/65", "12/65", "8/65"],
+          correct: 3,
+        },
+        {
+          text: "Fungsi probabilitas variabel random X adalah \\( f(x) = \\frac{32}{32}(\\frac{1}{2^x}) \\); \\( x = 1, 2, 3, 4, 5 \\). Maka \\( P(x \\le 2) \\) sama dengan ....",
+          options: ["0,588", "0,636", "0,774", "0,892"],
+          correct: 2,
+        },
+        {
+          text: "Dipunyai distribusi probabilitas dari X sebagai berikut:<br><table><tr><th>X</th><th>3</th><th>4</th><th>5</th></tr><tr><td>P(x)</td><td>1/8</td><td>5/8</td><td>2/8</td></tr></table><br>Maka variansi(X) sama dengan ....",
+          options: ["33/8", "33/9", "23/64", "43/64"],
+          correct: 3,
+        },
+        {
+          text: "Variabel random X mempunyai distribusi probabilitas:<br><table><tr><th>X</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>P(X)</td><td>0,1</td><td>0,2</td><td>0,3</td><td>0,3</td><td>0,1</td></tr></table><br>Dan mean(x) = 2,1, maka var(x) sama dengan ....",
+          options: ["1,29", "1,92", "2,24", "2,55"],
+          correct: 0,
+        },
+        {
+          text: "Diberikan fungsi probabilitas berikut:<br><table><tr><th>X</th><th>0</th><th>1</th><th>2</th><th>3</th></tr><tr><td>f(x)</td><td>0,216</td><td>0,432</td><td>0,288</td><td>0,064</td></tr></table><br>Maka deviasi standar dari X adalah ....",
+          options: ["0,25", "0,45", "0,65", "0,85"],
+          correct: 1,
+        },
+        {
+          text: "Dipunyai distribusi probabilitas X sebagai berikut:<br><table><tr><th>X</th><th>3</th><th>4</th><th>5</th></tr><tr><td>P(X=x)</td><td>1/8</td><td>5/8</td><td>2/8</td></tr></table><br>Jika \\( Y = (X-2)^2 \\) maka mean variabel random Y sama dengan ....",
+          options: ["33/8", "139/8", "39/8", "193/8"],
+          correct: 1,
+        },
+        {
+          text: "Diketahui \\( var(X) = 2,5 \\) dan \\( Y = -2X + 1 \\), maka \\( var(Y) \\) sama dengan ....",
+          options: ["8", "10", "11", "12"],
+          correct: 1,
+        },
+        {
+          text: "Diberikan fungsi probabilitas berikut:<br><table><tr><th>x</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr><tr><td>f(x)</td><td>0,41</td><td>0,09</td><td>0,16</td><td>0,31</td><td>0,03</td></tr></table><br>Jika variabel random \\( U = 2X-1 \\), \\( E(U) \\) ....",
+          options: ["2,46", "3,92", "4,92", "5,92"],
+          correct: 1,
+        },
+        {
+          text: "Variabel random X dan Y mempunyai distribusi probabilitas sebagai berikut:<br><table><tr><th>X \\ Y</th><th>0</th><th>1</th><th>2</th></tr><tr><td>1</td><td>0,1</td><td>0,2</td><td>0,1</td></tr><tr><td>2</td><td>0,2</td><td>0,2</td><td>0,2</td></tr></table><br>maka E(XY) = ....",
+          options: ["1,2", "1,6", "2,0", "2,8"],
+          correct: 1,
+        },
+        {
+          text: "Pengertian tentang eksperimen statistik berikut ini yang benar adalah ....",
+          options: [
+            "eksperimen menghasilkan 'hasil' yang tidak pasti",
+            "eksperimen adalah proses pengolahan data",
+            "eksperimen menghasilkan 'hasil' yang pasti",
+            "eksperimen adalah proses penyajian data",
+          ],
+          correct: 0,
+        },
+        {
+          text: "Variabel random X dan Y mempunyai distribusi probabilitas bersama:<br><table><tr><th>Y \\ X</th><th>0</th><th>1</th><th>2</th></tr><tr><td>1</td><td>0,1</td><td>0,2</td><td>0,1</td></tr><tr><td>2</td><td>0,2</td><td>0,2</td><td>0,2</td></tr></table><br>Maka E(X) dan E(Y) adalah ....",
+          options: [
+            "E(X) = 0,5 dan E(Y) = 1,2",
+            "E(X) = 0,7 dan E(Y) = 1,4",
+            "E(X) = 1,0 dan E(Y) = 1,6",
+            "E(X) = 1,2 dan E(Y) = 1,7",
+          ],
+          correct: 1,
+        },
+        {
+          text: "Dua variabel random X dan Y mempunyai distribusi bersama:<br><table><tr><th>Y \\ X</th><th>2</th><th>4</th></tr><tr><td>1</td><td>0,10</td><td>0,15</td></tr><tr><td>2</td><td>0,20</td><td>0,30</td></tr><tr><td>3</td><td>0,10</td><td>0,15</td></tr></table><br>Maka koefisien korelasi antara variabel random X dan Y sama dengan ....",
+          options: ["0,90", "0", "-0,90", "0,41"],
+          correct: 1,
+        },
+        {
+          text: "Sebanyak 800 keluarga masing-masing mempunyai 5 anak. Jika P(laki-laki) = P(anak perempuan), dapat diharapkan bahwa keluarga yang mempunyai 3 anak laki-laki ada sebanyak ....",
+          options: ["480", "250", "160", "25"],
+          correct: 1,
+        },
+        {
+          text: "Suatu perusahaan asuransi menjual polis asuransinya kepada 5 orang yang berumur sama. Dari tabel aktuaria, probabilitas bahwa seorang pada umur tersebut akan hidup 30 tahun lagi ialah 2/3. Probabilitas bahwa dalam 30 tahun paling sedikit 1 orang masih hidup ialah ....",
+          options: ["1/243", "1/5", "4/5", "242/243"],
+          correct: 3,
+        },
+        {
+          text: "Jika probabilitas akan mempunyai anak laki-laki adalah 0,55, probabilitas bahwa keluarga dengan 3 orang anak jenis kelamin anak-anak itu berselang-seling sama dengan ....",
+          options: ["0,126", "0,248", "0,392", "0,464"],
+          correct: 0,
+        },
+        {
+          text: "Jika p=0,4 untuk suatu proses binomial maka hitungan \\( \\frac{7!}{3!4!} (0,4)^3 (0,6)^4 \\) memberikan probabilitas akan memperoleh ....",
+          options: [
+            "tepat 3 sukses dalam 7 trials",
+            "tepat 4 sukses dalam 7 trials",
+            "3 sukses atau lebih dalam 7 trials",
+            "4 sukses atau lebih dalam 7 trials",
+          ],
+          correct: 0,
+        },
+        {
+          text: "Sebuah kotak berisi 2 bola putih dan 3 bola merah. Suatu sampel berukuran 3 diambil satu-satu tanpa pengembalian. Jika sampel terdiri dari satu bola merah, banyak sampel yang mungkin adalah ....",
+          options: ["2", "3", "4", "5"],
+          correct: 0,
+        },
+        {
+          text: "Dari sebuah kotak berisi bola yang diberi nomor 1 sampai dengan 5. Diambil 3 bola dengan pengembalian. Jika X adalah banyak bola bernomor ganjil yang terambil, maka harga harapan dari X atau E(X) adalah ....",
+          options: ["1,1", "1,5", "1,6", "1,8"],
+          correct: 2,
+        },
+        {
+          text: "Berdasarkan data yang lalu, RS. Sumber Waras telah menentukan rata-rata tiga orang pasien gawat darurat datang dirawat di RS itu tiap harinya. Jika X = banyak pasien gawat darurat yang datang tiap hari ke RS itu dianggap berdistribusi Poisson, maka probabilitas bahwa suatu hari tidak akan ada pasien gawat darurat datang ke RS itu adalah ....",
+          options: ["0,3358", "0,2637", "0,0498", "0,0261"],
+          correct: 2,
+        },
+        {
+          text: "Hanya 5% dari seluruh mahasiswa di kota besar Sukapintar yang mempunyai IQ ≥ 130. Misalkan X adalah banyaknya mahasiswa yang mempunyai IQ ≥ 130 di antara 50 orang mahasiswa yang dipilih secara random dari mahasiswa Sukapintar. Dengan pendekatan Poisson kita hitung P(X=2) sama dengan ....",
+          options: ["0,1245", "0,2565", "0,3475", "0,4175"],
+          correct: 1,
+        },
+        {
+          text: "Tingkat pengangguran di suatu daerah adalah 7,9%. Sampel random berukuran 100 diambil dari populasi tenaga kerja di daerah itu. Dengan menggunakan pendekatan Poisson, berapakah probabilitas 10 tenaga kerja yang menganggur terambil dalam sampel itu?",
+          options: ["0,0967", "0,1212", "0,1428", "0,1923"],
+          correct: 1,
+        },
+        {
+          text: "Seorang pejabat dari Direktorat Jenderal Pajak berpendapat bahwa hanya 65% wajib pajak yang telah membayar pajak. Dengan adanya penyuluhan mengenai perlunya membayar pajak, diharapkan persentase yang membayar pajak akan lebih meningkat. Masalah tersebut dapat dirumuskan sebagai uji hipotesis dengan hipotesis nol dan alternatif sebagai berikut ....",
+          options: [
+            "H₀ : p = 0,65 versus H₁ : p ≠ 0,65",
+            "H₀ : p ≥ 0,65 versus H₁ : p < 0,65",
+            "H₀ : p = 0,65 versus H₁ : p > 0,65",
+            "H₀ : p ≤ 0,65 versus H₁ : p > 0,65",
+          ],
+          correct: 2,
+        },
+        {
+          text: "Kantor tenaga kerja ingin menentukan apakah tingkat pengangguran (p) saat ini berbeda signifikan dengan ramalan sebesar 6% yang dibuat setengah tahun yang lalu. Untuk ini diambil suatu sampel tenaga kerja untuk menguji hipotesis yang dirumuskan sebagai ....",
+          options: ["H₀ : p = 6%", "H₀ : p > 6%", "H₀ : p < 6%", "H₀ : p ≥ 6%"],
+          correct: 0,
+        },
+        {
+          text: "Seorang pejabat di kota A mengatakan bahwa lebih dari 20% keluarga-keluarga di kota itu menyekolahkan anaknya sampai perguruan tinggi. Apabila sampel random dengan 500 keluarga di kota itu ternyata 114 yang menyekolahkan anaknya sampai perguruan tinggi, maka hipotesis nol dan hipotesis alternatif untuk kasus tersebut adalah ....",
+          options: [
+            "H₀ : p = 0,20    H₁ : p > 0,20",
+            "H₀ : p ≤ 0,20    H₁ : p > 0,20",
+            "H₀ : μ = 22,8    H₁ : μ ≠ 22,8",
+            "H₀ : μ ≤ 100     H₁ : μ > 100",
+          ],
+          correct: 1,
+        },
+        {
+          text: "Luas daerah di bawah kurva normal N(0,1) di sebelah kanan dari Z = -1,78 ialah ....",
+          options: ["0,4625", "0,0375", "0,9625", "0,5375"],
+          correct: 2,
+        },
+        {
+          text: "Misalkan kandungan kolesterol orang-orang yang ada dari suatu populasi dianggap berdistribusi normal dengan mean 200 mg/100 ml dan deviasi standar 20 mg/100 ml. Jika seorang dipilih secara random dari populasi itu, maka probabilitas bahwa kandungan kolesterolnya akan lebih dari 245 mg/100 ml adalah ....",
+          options: ["0,0122", "0,1220", "0,4878", "0,5878"],
+          correct: 0,
+        },
+        {
+          text: "Misalkan Z variabel random normal standar, maka ....",
+          options: [
+            "P(|Z| > 1,72) = 0,0854",
+            "P(|Z| > 1,52) = 0,6714",
+            "P(|Z| > 1,62) = 0,8948",
+            "P(|Z| > 1,52) = 0,8714",
+          ],
+          correct: 0,
+        },
+        {
+          text: "Nilai ujian seleksi penerimaan mahasiswa baru suatu universitas dianggap berdistribusi normal dengan mean 60,1 dan deviasi standar 10,4. Jika mahasiswa yang diterima hanya 16,6% maka nilai terendah calon mahasiswa yang akan diterima adalah ....",
+          options: ["63,574", "61,826", "70,188", "76,600"],
+          correct: 2,
+        },
+        {
+          text: "Dalam suatu populasi yang sangat besar 34% anggotanya adalah dalam 'umur sekolah'. Dalam sampel random dengan 100 orang dari populasi itu, maka probabilitas akan terdapat lebih dari 40 orang dalam 'umur sekolah' dengan menggunakan pendekatan normal adalah ....",
+          options: ["0,9147", "0,4147", "0,0853", "0,0085"],
+          correct: 3,
+        },
+        {
+          text: "Diketahui bahwa suatu proses produksi menghasilkan 10% dari hasil produksinya cacat. Dalam sampel random dengan 500 hasil produksi itu, probabilitas akan terdapat lebih dari 40 produk yang cacat adalah .... (gunakan pendekatan normal)",
+          options: ["0,1000", "0,4222", "0,9222", "1,0000"],
+          correct: 2,
+        },
+        {
+          text: "Daya tahan hidup suatu benda elektronik dianggap berdistribusi normal dengan mean 525 jam dan deviasi standar 22 jam. Jika P(|X - 525| > M) = 0,15, maka nilai M sama dengan ....",
+          options: ["7,863", "7,236", "6,963", "6,336"],
+          correct: 0,
+        },
+        {
+          text: "Mean dan deviasi standar daya rentang suatu benda adalah 55 kg dan 11 kg. Jika 60 benda seperti ini dipilih secara random, maka probabilitas bahwa mean sampel itu terletak antara 53 dan 57 adalah ....",
+          options: ["0,0793", "0,3726", "0,5368", "0,8414"],
+          correct: 3,
+        },
+        {
+          text: "Suatu sampel random dengan ukuran 121 dari populasi dengan deviasi standar σ = 25. Probabilitas bahwa X̄ akan berbeda dengan μ dengan lebih dari 5 unit adalah ....",
+          options: ["0,0139", "0,0278", "0,0316", "0,0632"],
+          correct: 1,
+        },
+        {
+          text: "Seorang tukang cat ingin mengetahui rata-rata waktu yang dipergunakan untuk mengeringkan dinding gedung bertingkat. Untuk itu dipilih secara random 49 tempat (dinding) yang ukurannya sama dan diperoleh mean waktu pengeringan adalah 45 menit dengan deviasi standar 9 menit. Interval konfidensi 95% untuk μ adalah ....",
+          options: [
+            "45,02 ≤ μ ≤ 54,98",
+            "42,48 ≤ μ ≤ 47,52",
+            "43,91 ≤ μ ≤ 56,09",
+            "44,43 ≤ μ ≤ 55,57",
+          ],
+          correct: 1,
+        },
+        {
+          text: "Suatu perusahaan alat listrik memproduksi bola-bola lampu yang mempunyai waktu nyala mendekati distribusi normal dengan deviasi standar 40 jam. Suatu sampel random dari 30 bola lampu mempunyai rata-rata waktu nyala = 780 jam. Maka interval konfidensi 96% untuk mean populasi dari semua bola-bola lampu tersebut ialah ....",
+          options: [
+            "778,25 ≤ μ ≤ 781,75",
+            "777,9 ≤ μ ≤ 782,1",
+            "765,0 ≤ μ ≤ 795,0",
+            "760,2 ≤ μ ≤ 790,8",
+          ],
+          correct: 2,
+        },
+
+        {
+          text: "Voltase X hasil suatu pembangkit listrik dianggap berdistribusi normal dengan mean μ dan variansi σ². Delapan observasi yang diambil secara random adalah: 9,9; 9,6; 11,2; 10,3; 8,4; 10,9; 9,4; 10,5. Jika H₀: μ ≥ 12, maka dengan sampel berukuran 8, nilai X̄ yang merupakan batas daerah kritik pada α = 0,05 ialah ....",
+          options: ["X̄ < 10,025", "X̄ < 11,477", "X̄ < 12,605", "X̄ < 13,711"],
+          correct: 1,
+        },
+
+        {
+          text: "Dalam suatu sampel random, 136 tidak mengalami kesembuhan dari 400 orang yang diberi vaksin flu. Interval kepercayaan 95% untuk proporsi populasi yang tidak mengalami kesembuhan dengan pemberian vaksin tersebut adalah ....",
+          options: [
+            "0,24 < p < 0,41",
+            "0,26 < p < 0,28",
+            "0,29 < p < 0,39",
+            "0,32 < p < 0,37",
+          ],
+          correct: 2,
+        },
+
+        {
+          text: "Suatu sampel berukuran 500 keluarga di suatu kota telah dipilih. Ternyata ada 114 keluarga yang menyekolahkan anaknya sampai perguruan tinggi. Interval konfidensi 98% untuk proporsi semua keluarga di kota tersebut yang menyekolahkan anaknya sampai perguruan tinggi adalah ....",
+          options: [
+            "0,184 ≤ p ≤ 0,272",
+            "0,148 ≤ p ≤ 0,272",
+            "0,184 ≤ p ≤ 0,227",
+            "0,148 ≤ p ≤ 0,227",
+          ],
+          correct: 0,
+        },
+
+        {
+          text: "Dari suatu populasi barang berukuran m diambil sampel random berukuran n. Jika di dalam sampel itu terdapat r barang rusak, estimasi jumlah barang rusak untuk populasi itu adalah ....",
+          options: ["rm/n", "(m-n)/m", "r/n", "r/m"],
+          correct: 2,
+        },
+
+        {
+          text: "Misalkan p = proporsi tenaga kerja di kota Pasa yang menganggur. Untuk menguji H₀: p ≤ 0,25 versus H₁: p > 0,25, diambil sampel 200 orang tenaga kerja dan diperoleh 65 orang di antaranya menganggur. Maka statistik penguji Z sama dengan ....",
+          options: ["1,78", "2,45", "2,92", "3,14"],
+          correct: 1,
+        },
+        {
+          text: "Seorang pejabat di kota A mengatakan bahwa lebih dari 20% keluarga di kota itu menyekolahkan anaknya sampai perguruan tinggi. Apabila sampel random dengan 500 keluarga di kota itu ternyata 114 yang menyekolahkan anaknya sampai perguruan tinggi, maka nilai Z hitung adalah ....",
+          options: ["1,57", "1,67", "1,96", "1,97"],
+          correct: 0,
+        },
+        {
+          text: "Untuk memperkirakan proporsi p keluarga yang hidup di bawah garis kemiskinan, diambil sampel random dengan 40 keluarga, dan 12 di antaranya hidup di bawah garis kemiskinan. Jika hasil observasi sampel itu kita gunakan untuk menguji H₀: p = 0,4, maka dapat kita hitung statistik penguji Z sama dengan ....",
+          options: ["-1,29", "2,12", "2,93", "3,44"],
+          correct: 0,
+        },
+        {
+          text: "Suatu perusahaan jalan tol ingin mengestimasi proporsi semua truk yang beroperasi antar 2 kota yang membawa beban berat, dan ia ingin peluangnya lebih dari 0,95 dan error tidak lebih dari 0,04. Jika proporsi yang sebenarnya tidak ada informasi, besar sampel n adalah ....",
+          options: ["384", "505", "577", "601"],
+          correct: 3,
+        },
+        {
+          text: "Misalkan X₁, X₂, ..., Xₙ variabel-variabel random normal independen dengan E(X)=μ dan Var(X)=4. Supaya interval konfidensi 95% untuk μ (mean populasi) berdasarkan rata-rata sampel X̄ mempunyai lebar tidak melebihi 1 satuan maka ukuran sampel yang harus digunakan paling sedikit adalah ....",
+          options: ["4", "8", "16", "62"],
+          correct: 3,
+        },
+        {
+          text: "Untuk mendapat konfidensi 95% untuk μ dengan lebar interval sama dengan 2, besar ukuran sampel n yang harus diambil dari populasi dengan σ = 5 adalah ....",
+          options: ["10", "20", "96", "384"],
+          correct: 2,
+        },
+        {
+          text: "Diketahui data umur lima orang karyawan (dalam tahun) sebagai berikut: 20, 28, 25, 32, 35. Jika data itu sampel random dari populasi normal dengan mean μ dan variansi σ², interval kepercayaan (konfidensi) 95% untuk μ adalah ....",
+          options: [
+            "22,85 ≤ μ ≤ 33,15",
+            "22,612 ≤ μ ≤ 36,278",
+            "22,167 ≤ μ ≤ 37,823",
+            "22,534 ≤ μ ≤ 37,996",
+          ],
+          correct: 2,
+        },
+        {
+          text: "Seorang tukang cat ingin mengetahui rata-rata waktu yang dipergunakan untuk mengeringkan dinding gedung bertingkat. Untuk itu dipilih secara random 15 tempat (dinding) yang ukurannya sama dan diperoleh mean waktu pengeringan adalah 60 menit dengan deviasi standar 9 menit. Jika diketahui bahwa populasi waktu pengeringan adalah normal, interval konfidensi 95% untuk μ adalah ....",
+          options: [
+            "55,02 ≤ μ ≤ 64,98",
+            "57,48 ≤ μ ≤ 62,52",
+            "53,91 ≤ μ ≤ 66,09",
+            "54,43 ≤ μ ≤ 65,57",
+          ],
+          correct: 0,
+        },
+        {
+          text: "Seorang tukang cat ingin mengetahui rata-rata waktu yang dipergunakan untuk mengeringkan dinding gedung bertingkat. Untuk itu dipilih secara random 15 tempat (dinding) yang ukurannya sama dan diperoleh mean waktu pengeringan adalah 60 menit dengan deviasi standar 11 menit. Jika diketahui bahwa populasi waktu pengeringan adalah normal, interval konfidensi 95% untuk μ adalah ....",
+          options: [
+            "55,02 ≤ μ ≤ 64,98",
+            "57,48 ≤ μ ≤ 62,52",
+            "53,91 ≤ μ ≤ 66,09",
+            "54,43 ≤ μ ≤ 65,57",
+          ],
+          correct: 3,
+        },
+        {
+          text: "Voltase X hasil suatu pembangkit listrik dianggap berdistribusi normal dengan mean μ dan variansi σ². Delapan observasi yang diambil secara random adalah: 9,9; 9,6; 11,2; 10,3; 8,4; 10,9; 9,4; 10,5. Maka interval konfidensi 90% untuk σ² adalah ....",
+          options: [
+            "0,0283 ≤ σ² ≤ 5,0425",
+            "0,1273 ≤ σ² ≤ 2,9972",
+            "0,2997 ≤ σ² ≤ 1,9972",
+            "0,4025 ≤ σ² ≤ 2,6161",
+          ],
+          correct: 2,
+        },
+        {
+          text: "Sampel random berukuran 5 diambil dari suatu populasi hamburger. Data kandungan lemak hamburger adalah sebagai berikut: 32,4; 30,9; 33,2; 31,5; 34,3. Untuk membentuk interval kepercayaan 95% untuk σ, nilai statistik ((n−1)s²)/χ²₀.₀₂₅ sama dengan ....",
+          options: ["0,36", "0,41", "0,42", "0,65"],
+          correct: 1,
+        },
+        {
+          text: "Berat badan 20 mahasiswa PT yang dipilih secara acak adalah: 45, 50, 52, 43, 53, 57, 45, 50, 55, 46, 50, 48, 50, 48, 55, 60, 63, 55, 67, 65. Dengan menganggap populasi berat badan mahasiswa PT berdistribusi normal, interval konfidensi 90% untuk σ² adalah ....",
+          options: [
+            "25,09 ≤ σ² ≤ 81,09",
+            "29,21 ≤ σ² ≤ 87,03",
+            "25,60 ≤ σ² ≤ 90,02",
+            "29,81 ≤ σ² ≤ 89,05",
+          ],
+          correct: 1,
+        },
+
+        {
+          text: "Tinggi anak laki-laki diasumsikan berdistribusi normal dengan standar deviasi 5,2 cm. Dengan sampel random berukuran n = 100, jika P(|X̄ − μ| ≤ c) = 0,95, maka c sama dengan ....",
+          options: ["0,75", "1,02", "2,05", "3,62"],
+          correct: 1,
+        },
+
+        {
+          text: "Dua kelompok A dan B masing-masing terdiri dari 100 orang yang mengidap suatu penyakit. Suatu serum diberikan kepada kelompok A, sedangkan kelompok B tidak diberi serum. Ternyata 75 orang dari kelompok A sembuh, sedangkan dari kelompok B sembuh 65 orang. Ujilah hipotesis bahwa serum mempunyai penyembuhan penyakit itu. Statistik penguji Z sama dengan ....",
+          options: ["1,54", "1,84", "2,04", "2,24"],
+          correct: 0,
+        },
+
+        {
+          text: "Dua kelompok A dan B masing-masing terdiri dari 100 orang yang mengidap suatu penyakit. Suatu serum diberikan kepada kelompok A, sedangkan kelompok B tidak diberi serum. Ternyata 75 orang dari kelompok A sembuh, sedangkan dari kelompok B sembuh 65 orang. Interval konfidensi 95% untuk selisih proporsi yang sembuh karena serum ialah (p₁ − p₂) ....",
+          options: [
+            "−0,026 ≤ p₁ − p₂ ≤ 0,226",
+            "−0,026 ≤ p₁ − p₂ ≤ 0,262",
+            "0,062 ≤ p₁ − p₂ ≤ 0,262",
+            "0,260 ≤ p₁ − p₂ ≤ 0,622",
+          ],
+          correct: 1,
+        },
+
+        {
+          text: "Dua sampel random independen diambil dari populasi normal dengan mean μ₁ dan μ₂ serta deviasi standar σ₁ dan σ₂. Diketahui: Sampel I: n₁ = 16, x̄₁ = 93, s₁² = 132. Sampel II: n₂ = 26, x̄₂ = 85, s₂² = 157. Maka interval kepercayaan 95% untuk μ₁ − μ₂ adalah ....",
+          options: [
+            "1,14 ≤ μ₁ − μ₂ ≤ 17,116",
+            "0,972 ≤ μ₁ − μ₂ ≤ 16,838",
+            "0,829 ≤ μ₁ − μ₂ ≤ 16,031",
+            "0,433 ≤ μ₁ − μ₂ ≤ 15,567",
+          ],
+          correct: 1,
+        },
+
+        {
+          text: "Dari sampel random yang masing-masing diambil dari populasi normal dengan variansi sama diperoleh data: x̄ = 75, n₁ = 36, Σ(x−x̄)² = 1482; ȳ = 60, n₂ = 64, Σ(y−ȳ)² = 1830. Maka nilai S²p adalah ....",
+          options: ["22,361", "26,336", "33,796", "43,683"],
+          correct: 2,
+        },
+
+        {
+          text: "Dua sampel random independen diambil dari populasi normal dengan μ₁ dan μ₂ serta deviasi standar σ₁ dan σ₂. Diketahui: Sampel I: n₁ = 26, x̄₁ = 93, s₁² = 132. Sampel II: n₂ = 16, x̄₂ = 85, s₂² = 157. Dengan anggapan σ₁ = σ₂, maka varians pooled (S²p) sama dengan ....",
+          options: ["138,275", "141,375", "144,475", "162,575"],
+          correct: 1,
+        },
+
+        {
+          text: "Seorang peneliti mengatakan bahwa tidak ada perbedaan antara rata-rata nikotin yang dikandung oleh batang rokok merek A dan B. Diperoleh data: A: n = 15, x̄ = 20,37, s = 7,21. B: n = 20, x̄ = 19,80, s = 7,26. Dengan menganggap variansi kedua populasi sama, maka statistik uji t untuk menguji H₀: μA − μB = 0 adalah ....",
+          options: ["4,837", "1,596", "0,845", "0,231"],
+          correct: 3,
+        },
+
+        {
+          text: "Diketahui ukuran sampel dan banyaknya yang selalu mendengarkan program radio sandiwara: Laki-laki: n₁ = 100, y₁ = 65. Perempuan: n₂ = 100, y₂ = 80. Jika p₁ dan p₂ masing-masing menyatakan proporsi laki-laki dan perempuan yang mendengarkan sandiwara, maka nilai statistik penguji Z untuk menguji H₀: p₁ = p₂ adalah ....",
+          options: ["−2,38", "−1,24", "1,02", "1,98"],
+          correct: 0,
+        },
+
+        {
+          text: "Suatu sampel random terdiri dari 10 rokok rata-rata mengandung nikotin 3,1 mg dengan standar deviasi 0,5 mg. Sedangkan sampel random lain yang terdiri dari 8 rokok rata-rata mengandung nikotin 2,7 mg dengan standar deviasi 0,7 mg. Dengan anggapan kedua sampel berasal dari populasi normal dengan variansi masing-masing σ₁² dan σ₂², interval konfidensi 98% untuk σ₁²/σ₂² adalah ....",
+          options: [
+            "0,076 ≤ σ₁²/σ₂² ≤ 2,862",
+            "0,067 ≤ σ₁²/σ₂² ≤ 2,882",
+            "0,076 ≤ σ₁²/σ₂² ≤ 2,362",
+            "0,066 ≤ σ₁²/σ₂² ≤ 2,362",
+          ],
+          correct: 2,
+        },
+      ];
+
+      let currentQuestionIndex = 0;
+      let score = 0;
+      let shuffledQuestions = [];
+
+      function shuffleArray(array) {
+        let currentIndex = array.length,
+          randomIndex;
+        while (currentIndex !== 0) {
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex],
+            array[currentIndex],
+          ];
+        }
+        return array;
+      }
+
+      function initQuiz() {
+        shuffledQuestions = shuffleArray(JSON.parse(JSON.stringify(questions)));
+
+        shuffledQuestions.forEach((q) => {
+          let optionsWithIndex = q.options.map((opt, idx) => ({
+            text: opt,
+            originalIndex: idx,
+          }));
+          optionsWithIndex = shuffleArray(optionsWithIndex);
+          q.shuffledOptions = optionsWithIndex;
+        });
+
+        renderQuestion();
+      }
+
+      function renderQuestion() {
+        const quizBody = document.getElementById("quiz-body");
+        quizBody.innerHTML = "";
+
+        if (currentQuestionIndex >= shuffledQuestions.length) {
+          showScore();
+          return;
+        }
+
+        const q = shuffledQuestions[currentQuestionIndex];
+        document.getElementById("progress-text").innerText =
+          `Soal ${currentQuestionIndex + 1} dari ${shuffledQuestions.length}`;
+
+        const qContainer = document.createElement("div");
+        qContainer.className = "question-container active";
+
+        const qText = document.createElement("div");
+        qText.className = "question-text";
+        qText.innerHTML = q.text;
+        qContainer.appendChild(qText);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options-list";
+
+        q.shuffledOptions.forEach((opt, idx) => {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+
+          const letter = String.fromCharCode(65 + idx);
+          btn.innerHTML = `<strong>${letter}.</strong> ${opt.text}`;
+
+          btn.onclick = () => selectOption(btn, opt.originalIndex, q.correct);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+
+        qContainer.appendChild(optionsList);
+
+        const feedback = document.createElement("div");
+        feedback.className = "feedback";
+        feedback.id = "feedback-msg";
+        qContainer.appendChild(feedback);
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "btn";
+        nextBtn.id = "next-btn";
+        nextBtn.innerText = "Soal Selanjutnya";
+        nextBtn.disabled = true;
+        nextBtn.onclick = nextQuestion;
+
+        const clearFix = document.createElement("div");
+        clearFix.className = "clearfix";
+
+        qContainer.appendChild(nextBtn);
+        qContainer.appendChild(clearFix);
+        quizBody.appendChild(qContainer);
+
+        if (window.MathJax) {
+          MathJax.typesetPromise();
+        }
+      }
+
+      function selectOption(selectedBtn, originalIndex, correctIndex) {
+        const buttons = document.querySelectorAll(".option-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const feedback = document.getElementById("feedback-msg");
+
+        buttons.forEach((btn) => {
+          btn.disabled = true;
+          btn.style.cursor = "not-allowed";
+        });
+
+        if (originalIndex === correctIndex) {
+          selectedBtn.classList.add("correct");
+          feedback.innerText = "✅ Benar!";
+          feedback.style.color = "#10b981";
+          score++;
+        } else {
+          selectedBtn.classList.add("wrong");
+          feedback.innerText = "❌ Kurang tepat.";
+          feedback.style.color = "#ef4444";
+
+          const currentQuestion = shuffledQuestions[currentQuestionIndex];
+          const correctOptIndexInShuffled =
+            currentQuestion.shuffledOptions.findIndex(
+              (o) => o.originalIndex === correctIndex,
+            );
+
+          buttons.forEach((btn) => {
+            if (
+              btn.innerHTML.includes(
+                String.fromCharCode(65 + correctOptIndexInShuffled) + ".",
+              )
+            ) {
+              btn.classList.add("correct");
+            }
+          });
+        }
+
+        feedback.style.display = "block";
+        nextBtn.disabled = false;
+      }
+
+      function nextQuestion() {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+
+      function showScore() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("progress-text").innerText = "Selesai!";
+        document.getElementById("score-container").style.display = "block";
+        document.getElementById("total-questions").innerText =
+          shuffledQuestions.length;
+        document.getElementById("final-score").innerText = score;
+      }
+
+      window.onload = initQuiz;
+    </script>
+  </body>
+</html>
